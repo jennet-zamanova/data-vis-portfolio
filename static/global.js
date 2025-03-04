@@ -22,9 +22,9 @@ for (let p of pages) {
 	let url = p.url;
     let title = p.title;
 
-    if (!url.startsWith("http")) {
-        url = "../" + url;
-    }    
+    // if (!url.startsWith("http")) {
+    //     url = "../" + url;
+    // }    
 
     let a = document.createElement("a");
     a.href = url;
