@@ -104,6 +104,10 @@ img {
   margin: 0;
 }
 
+.projects > article > h3 {
+  margin: 0;
+}
+
 
 .education > article{
   display: flex;

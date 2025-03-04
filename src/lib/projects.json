@@ -1,0 +1,14 @@
+[
+    {
+        "title": "A2 for 6.c35",
+        "href": "projects/project-pages/a2.html",
+        "image": "../images/a3/commuter_rail.png",
+        "description": "<ol> <li>Single Zoning vs City Density</li> <li>People with what income live in single zoning?</li> <li>What Races live in Single Family Zoning?</li> <li>Are single zoning done near public transport/work?</li> </ol> "
+    },
+    {
+        "title": "A3 for 6.c35",
+        "href": "projects/project-pages/a3.html",
+        "image": "../images/a3/final.png",
+        "description": "Visualization Critique & Redesign of the <a href='https://www.nytimes.com/2022/01/06/opinion/omicron-covid-us.html' target='_blank'>Here’s When We Expect Omicron to Peak</a> piece by NYT"
+    }
+]

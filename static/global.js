@@ -5,7 +5,7 @@ function $$ (selector, context = document) {
 }
 
 let pages = [
-	{url: ".", title: "Homes"},
+	{url: "./", title: "Homes"},
 	{url: "projects", title: "Projects"},
     {url: "contact", title: "Contact"},
 	{url: "resume", title: "Resume"},
