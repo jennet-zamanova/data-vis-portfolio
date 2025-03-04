@@ -58,3 +58,28 @@
         
     </article>
 </section>
+
+<style>
+article {
+  margin: 0 2em;
+}
+
+.project-info {
+  display: grid;
+  gap: 1em;
+  grid-template-columns: 1fr 1fr;
+}
+
+.project-info img {
+  /* max-width: 200px; */
+}
+
+.education > article{
+  display: flex;
+  gap: 2em;
+}
+
+.education > article > h3 {
+  flex: 1;
+}
+</style>

@@ -96,32 +96,8 @@ img {
 }
 
 
-.education > article{
-  display: flex;
-  gap: 2em;
-}
-
-.education > article > h3 {
-  flex: 1;
-}
-
-
-
 hr.dotted {
   border-top: 3px dotted #bbb;
-}
-
-.resume article {
-  margin: 0 2em;
-}
-
-.resume .project-info {
-  display: grid;
-  gap: 1em;
-  grid-template-columns: 1fr 1fr;
-}
-.resume .project-info img {
-  /* max-width: 200px; */
 }
 
 .color-scheme{
