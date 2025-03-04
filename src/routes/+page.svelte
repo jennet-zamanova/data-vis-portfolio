@@ -3,6 +3,9 @@
     import Project from "$lib/Project.svelte";
 </script>
 
+<svelte:head>
+  <title>Home</title>
+</svelte:head>
 
 <h1>Jennet</h1>
 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias illo quibusdam vero pariatur harum rerum distinctio optio saepe, suscipit, ab voluptatum eligendi nesciunt, possimus cupiditate quis facilis deserunt impedit enim.</p>
