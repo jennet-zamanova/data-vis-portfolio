@@ -6,9 +6,9 @@ function $$ (selector, context = document) {
 
 let pages = [
 	{url: "./", title: "Homes"},
-	{url: "projects", title: "Projects"},
-    {url: "contact", title: "Contact"},
-	{url: "resume", title: "Resume"},
+	{url: "./projects", title: "Projects"},
+    {url: "./contact", title: "Contact"},
+	{url: "./resume", title: "Resume"},
     {url: "https://github.com/jennet-zamanova", title: "Github"}
 ];
 
@@ -21,7 +21,7 @@ document.body.prepend(nav);
 for (let p of pages) {
 	let url = p.url;
     let title = p.title;
-
+    console.log("url", url);
     if (!url.startsWith("http")) {
         url = "../" + url;
     }    

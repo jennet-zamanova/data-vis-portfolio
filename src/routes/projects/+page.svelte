@@ -7,7 +7,7 @@
 <div class="projects">
     <article>
         <h2><a href="../Vis & Society Assignment 2.htm">A2 for 6.c35</a></h2>
-        <img src="../images/Vis_Society_Assignment_2_files/images/commuter_rail.png" alt="">
+        <img src="../images/a3/commuter_rail.png" alt="">
         <ol>
             <li>Single Zoning vs City Density</li>
             <li>People with what income live in single zoning?</li>
