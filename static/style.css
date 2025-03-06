@@ -51,19 +51,6 @@ a {
   padding: 0.5em;
 }
 
-.current {
-  border-bottom-width: 0.4em;
-  border-bottom-style: solid;
-  border-bottom-color: var(--border-color);
-}
-
-a:hover {
-  border-bottom-width: 0.4em;
-  border-bottom-style: solid;
-  border-bottom-color: var(--color-accent);
-  background-color: color-mix(in oklch, var(--color-accent), canvas 85%);
-}
-
 input, textarea, button, .color-scheme {
   font: inherit;
 }
@@ -98,13 +85,4 @@ img {
 
 hr.dotted {
   border-top: 3px dotted #bbb;
-}
-
-.color-scheme{
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-  display: inline-flex;
-  gap: 4px;
-  font-size: 80%;
 }
