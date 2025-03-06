@@ -6,9 +6,9 @@
 
     let pages = [
 	{url: "./", title: "Homes"},
-	{url: "./projects", title: "Projects"},
-    {url: "./contact", title: "Contact"},
-	{url: "./resume", title: "Resume"},
+	{url: "projects", title: "Projects"},
+    {url: "contact", title: "Contact"},
+	{url: "resume", title: "Resume"},
     {url: "https://github.com/jennet-zamanova", title: "Github"}
 ];
     let colorScheme = localStorage.colorScheme ?? "light dark";
@@ -22,7 +22,7 @@
 
 <nav>
     {#each pages as p}
-    <a href={p.url} class:current={"." + $page.route.id === p.url} target={p.url.startsWith("http") ? "_blank" : null}>
+    <a href={p.url} class:current={$page.route.id === "/"+p.url || "." + $page.route.id === p.url} target={p.url.startsWith("http") ? "_blank" : null}>
         {p.title}
     </a>
 
