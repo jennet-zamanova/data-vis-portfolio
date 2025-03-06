@@ -12,7 +12,7 @@
 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias illo quibusdam vero pariatur harum rerum distinctio optio saepe, suscipit, ab voluptatum eligendi nesciunt, possimus cupiditate quis facilis deserunt impedit enim.</p>
 <img src="images/Jennet.jpg" alt="Jennet in front the main dome at MIT" width="550px">
 
-{#await fetch("https://api.github.com/users/zhengsophia")}
+{#await fetch("https://api.github.com/users/jennet-zamanova")}
   <p>Loading...</p>
 {:then response}
   {#await response.json()}
