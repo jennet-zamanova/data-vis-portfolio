@@ -18,7 +18,7 @@
     <article class="personal-project">
         <h3>Software Design 6.104</h3>
         <div class="project-info">
-            <img src="../images/craftfolio.png" alt="craftfolio">
+            <img src="images/craftfolio.png" alt="craftfolio">
             <p><b><a href="https://craft-folio.vercel.app/" target="_blank">Craftfolio</a></b> is a web app designed for beginner crafters looking to confidently start and complete creative fiber projects. 
                 Our app targets a unique, underserved audience of new crafters who often feel overwhelmed by the complexity of project planning and lack of accessible resources. 
                 Craftfolio empowers users by providing an intuitive project tracker and resource management tools tailored specifically to beginners working with different fibers.
@@ -35,7 +35,7 @@
     <article class="personal-project">
         <h3>How to Ship Almost Anything with AI</h3>
         <div class="project-info">
-            <img src="../images/dishiq.png" alt="dishiq">
+            <img src="images/dishiq.png" alt="dishiq">
             <div>
                 <p>
                     <b><a href="https://dish-iq.streamlit.app/" target="_blank"> DishIQ</a></b> is an innovative app that transforms how you navigate menus. Here's what it does:
