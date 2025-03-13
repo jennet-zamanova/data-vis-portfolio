@@ -8,6 +8,7 @@
     <img src={data.image} alt="">
     <div>
         {@html data.description}
+        <p>C. {data.year}</p>
     </div>
 </article>
 
@@ -25,5 +26,9 @@ article > h2 {
 
 article > h3 {
   margin: 0;
+}
+
+p {
+  font-style: italic;
 }
 </style>
