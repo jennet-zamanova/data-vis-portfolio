@@ -5,39 +5,23 @@
 <script>
   import * as d3 from "d3";
   import { onMount } from "svelte";
-  import {
-    computePosition,
-    autoPlacement,
-    offset,
-  } from '@floating-ui/dom';
-  import Bar from '$lib/Bar.svelte';
+  import Bar from '$lib/StackedBar.svelte';
+  import FileLines from '$lib/FileLines.svelte';
   import { base } from '$app/paths';
 
-
-
-  let width = 1000, height = 600;
-  let margin = {top: 10, right: 10, bottom: 30, left: 20};
-
-  let usableArea = {
-    top: margin.top,
-    right: width - margin.right,
-    bottom: height - margin.bottom,
-    left: margin.left
-  };
-  usableArea.width = usableArea.right - usableArea.left;
-  usableArea.height = usableArea.bottom - usableArea.top;
-
-  let xAxis, yAxis, yAxisGridlines;
-  let commitTooltip;
+  import CommitScatterplot from "./Scatterplot.svelte"
+  import Scrolly from "svelte-scrolly";
 
 
   let data = [];
   let commits = [];
-  // let cursor = {x: 0, y: 0};
-  let tooltipPosition = {x: 0, y: 0};
-  let hoveredIndex = -1;
   let clickedCommits = [];
 
+  let commitProgress = 100;
+  let raceProgress = 100;
+  let width = 1000;
+
+  let colorScale = d3.scaleOrdinal(d3.schemeTableau10);
 
   onMount(async () => {
     data = await d3.csv(`${base}/loc.csv`, row => ({
@@ -73,141 +57,105 @@
     commits = commits.filter(commit => !/^0+$/.test(commit.id));
   });
 
-  async function dotInteraction (index, evt) {
-    let hoveredDot = evt.target;
-    if (evt.type === "mouseenter") {
-      hoveredIndex = index;
-      // cursor = {x: evt.x, y: evt.y};
-      tooltipPosition = await computePosition(hoveredDot, commitTooltip, {
-        strategy: "fixed", // because we use position: fixed
-        middleware: [
-          offset(5), // spacing from tooltip to dot
-          autoPlacement() // see https://floating-ui.com/docs/autoplacement
-        ],
-      });        }
-    else if (evt.type === "mouseleave") {
-      hoveredIndex = -1
-    }
-    else if (evt.type === "click") {
-      let commit = commits[index]
-      if (!clickedCommits.includes(commit)) {
-        // Add the commit to the clickedCommits array
-        clickedCommits = [...clickedCommits, commit];
-      }
-      else {
-          // Remove the commit from the array
-          clickedCommits = clickedCommits.filter(c => c !== commit);
-      }
-    }
 
-  }
+  $: timeScale = d3.scaleTime()
+    .domain(d3.extent(commits.map(d => d.datetime)))
+    .range([0, 100]);
+  $: commitMaxTime = timeScale.invert(commitProgress);
 
+  $: raceMaxTime = timeScale.invert(raceProgress);
 
+  $: filteredCommits = commits.filter(commit => commit.datetime <= commitMaxTime)
 
-  $: xScale = d3.scaleTime()
-		.domain(d3.extent(commits.map(d => d.datetime)))
-		.range([usableArea.left, usableArea.right])
-    .nice();
-	
-	$: yScale = d3.scaleLinear()
-			.domain([24, 0])
-			.range([usableArea.bottom, usableArea.top]);
+  $: filteredLines = data.filter(d => d.datetime <= commitMaxTime)
 
-  $: {
-    d3.select(xAxis).call(d3.axisBottom(xScale));
-    d3.select(yAxis).call(d3.axisLeft(yScale).tickFormat(d => String(d % 24).padStart(2, "0") + ":00"));
-  }
+  $: raceLines = data.filter(d => d.datetime <= raceMaxTime)
 
-  $: {
-    d3.select(yAxisGridlines).call(
-      d3.axisLeft(yScale)
-        .tickFormat("")
-        .tickSize(-usableArea.width)
-    );
-  }
+  $: allTypes = Array.from(new Set(filteredLines.map(d => d.type)));
 
-  $: hoveredCommit = commits[hoveredIndex] ?? hoveredCommit ?? {};
-
-  $: allTypes = Array.from(new Set(data.map(d => d.type)));
-
-  $: selectedLines = (clickedCommits.length > 0 ? clickedCommits : commits).flatMap(d => d.lines);
+  $: selectedLines = (clickedCommits.length > 0 ? clickedCommits : filteredCommits).flatMap(d => d.lines);
 
   $: selectedCounts = d3.rollup(
     selectedLines,
     v => v.length,
     d => d.type
-);
+  );
 
   $: languageBreakdown = allTypes.map(type => [type, selectedCounts.get(type) || 0]);
 
-
+  function updateClickedCommits(commits) {
+    clickedCommits = commits;
+  }
 </script>
 
 
 <h1>Meta</h1>
-<p>Total lines of code: {data.length}</p>
+
+<p>Total lines of code: {filteredLines.length}</p>
 <dl class="stats">
   <dt>Commits</dt>
-	<dd>{commits.length}</dd>
+	<dd>{filteredCommits.length}</dd>
 	<dt>Total <abbr title="Lines of code">LOC</abbr></dt>
-	<dd>{data.length}</dd>
+	<dd>{filteredLines.length}</dd>
   <dt>Files</dt>
-	<dd>{(new Set(data.map((d) => d["file"]))).size}</dd>
+	<dd>{(new Set(filteredLines.map((d) => d["file"]))).size}</dd>
   <dt>Maximum file length</dt>
-	<dd>{d3.max(data.map((d) => d["line"]))}</dd>
+	<dd>{d3.max(filteredLines.map((d) => d["line"]))}</dd>
   <dt>Maximum depth</dt>
-	<dd>{d3.max(data.map((d) => d["depth"]))}</dd>
+	<dd>{d3.max(filteredLines.map((d) => d["depth"]))}</dd>
   
 </dl>
 
-<svg viewBox="0 0 {width} {height}">
-  <g transform="translate(0, {usableArea.bottom})" bind:this={xAxis} />
-  <g class="gridlines" transform="translate({usableArea.left}, 0)" bind:this={yAxisGridlines} />
-  <g transform="translate({usableArea.left}, 0)" bind:this={yAxis} />
-  <g class="dots">
-    {#each commits as commit, index }
-      <circle
-        cx={ xScale(commit.datetime) }
-        cy={ yScale(commit.hourFrac) }
-        r="5"
-        fill="steelblue"
-        on:mouseenter={evt => dotInteraction(index, evt)}
-	      on:mouseleave={evt => dotInteraction(index, evt)}
-        on:click={ evt => dotInteraction(index, evt) }
-        class:selected={ clickedCommits.includes(commit) }
-      />
-    {/each}
-  </g>
-</svg>
-<Bar data={languageBreakdown} width={width} />
+<Scrolly bind:progress={ commitProgress }>
+	{#each commits as commit, index }
+    <p>
+      On {commit.datetime.toLocaleString("en", {dateStyle: "full", timeStyle: "short"})},
+      {index === 0 
+        ? "I set forth on my very first commit, beginning a magical journey of code. You can view it "
+        : "I added another enchanted commit, each line sparkling with a touch of wonder. See it "}
+      <a href="{commit.url}" target="_blank">
+        {index === 0 ? "here" : "here"}
+      </a>.
+      This update transformed {commit.totalLines} lines across { d3.rollups(commit.lines, D => D.length, d => d.file).length } files.
+      With every commit, our project grows into a kingdom of dreams.
+    </p>
+  {/each}
 
-<!-- Other attributes omitted for brevity -->
+	<svelte:fragment slot="viz">
+    <CommitScatterplot commits={filteredCommits} updateClickedCommits={updateClickedCommits}/>
+    <Bar data={languageBreakdown} width={0.4*width} colorScale={colorScale}/>
+	</svelte:fragment>
+</Scrolly>
 
-<dl class="info tooltip" hidden={hoveredIndex === -1} bind:this={commitTooltip}  style="top: {tooltipPosition.y}px; left: {tooltipPosition.x}px">
-  <dt>Commit</dt>
-  <dd><a href="{ hoveredCommit.url }" target="_blank">{ hoveredCommit.id }</a></dd>
 
-  <dt>Date</dt>
-  <dd>{ hoveredCommit.datetime?.toLocaleString("en", {dateStyle: "full"}) }</dd>
+<Scrolly bind:progress={raceProgress} --scrolly-layout="viz-first">
+  {#each commits as commit, index }
+    <p>
+      On {commit.datetime.toLocaleString("en", {dateStyle: "full", timeStyle: "short"})},
+      {index === 0 
+        ? "I set forth on my very first commit, beginning a magical journey of code. You can view it "
+        : "I added another enchanted commit, each line sparkling with a touch of wonder. See it "}
+      <a href="{commit.url}" target="_blank">
+        {index === 0 ? "here" : "here"}
+      </a>.
+      This update transformed {commit.totalLines} lines across { d3.rollups(commit.lines, D => D.length, d => d.file).length } files.
+      With every commit, our project grows into a kingdom of dreams.
+    </p>
+  {/each}
+  <svelte:fragment slot="viz">
+    <FileLines lines={raceLines} width={width} colorScale={colorScale}/>
+	</svelte:fragment>
+</Scrolly>
 
-  <dt>Time</dt>
-  <dd>{ hoveredCommit.time?.toLocaleString("en", {dateStyle: "full"}) }</dd>
 
-  <dt>Author</dt>
-  <dd>{ hoveredCommit.author?.toLocaleString("en", {dateStyle: "full"}) }</dd>
-
-  <dt>Lines Added</dt>
-  <dd>{ hoveredCommit.totalLines?.toLocaleString("en", {dateStyle: "full"}) }</dd>
-
-  <!-- Add: Time, author, lines edited -->
-</dl>
 
 
 
 
 <style>
-.selected {
-    fill: var(--color-accent);
+
+:global(body) {
+  max-width: min(120ch, 80vw);
 }
 
 dl {
@@ -215,42 +163,6 @@ dl {
     grid-template-columns: repeat(4, 1fr);
 }
 
-dl.info {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.5rem 1rem;
-  align-items: baseline;
-  transition-duration: 500ms;
-	transition-property: opacity, visibility;
-
-	&[hidden]:not(:hover, :focus-within) {
-		opacity: 0;
-		visibility: hidden;
-	}
-}
-
-dl.info dt {
-  font-weight: lighter;
-  margin: 0;
-  text-align: right; 
-}
-
-dl.info dd {
-  font-weight: bold;
-  margin: 0;
-}
-
-.tooltip {
-  position: fixed;
-  top: 20em;
-  left: 1em;
-  background-color: oklch(100% 0% 0 / 80%);
-  /* oklch(100% 0% 0 / 80%); */
-  border-radius: 0.5em;
-  box-shadow: 6px 6px 2px 2px rgba(98, 98, 105, 0.2);
-  padding: 1em;
-  backdrop-filter: blur(10px);
-}
 
 .stats dt {
   grid-row: 1; /* Place all <dt> elements in the first row */
@@ -265,22 +177,17 @@ dl.info dd {
   font-size: larger;
 }
 
-svg {
-		overflow: visible;
+label {
+  display: flex;
 }
 
-.gridlines {
-	stroke-opacity: .2;
+label input {
+  flex: 1;
 }
 
-circle {
-	transition: 200ms;
-  transform-origin: center;
-  transform-box: fill-box;
-
-
-	&:hover {
-		transform: scale(1.5);
-	}
+.slider {
+  width: 100%;
+  text-align: right;
+  white-space: nowrap
 }
 </style>
