@@ -139,7 +139,7 @@
         opacity: 100% !important;
     }
 
-    path.selected{
+    path:focus-visible{
         stroke: white;
         stroke-width: 2px;
         stroke-dasharray: 4; /* Adjust the dash length as needed */
